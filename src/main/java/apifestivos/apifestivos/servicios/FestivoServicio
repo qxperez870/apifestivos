@@ -87,11 +87,11 @@ public class FestivoServicio implements IFestivosServicio  {
         return fecha;
     }
 
-    private List<Holiday> calcularFestivos(List<Holiday> festivos, int año) {
+    private List<Festivo> calcularFestivos(List<Festivo> festivos, int año) {
         if (festivos != null) {
             Date pascua = obtenerDomingoPascua(año);
             int i = 0;
-            for (final Holiday festivo : festivos) {
+            for (final Festivo festivo : festivos) {
                 switch (festivo.getIdtipo()) {
                     case 1:
                         festivo.setFecha(new Date(año - 1900, festivo.getMes() - 1, festivo.getDia()));
@@ -114,10 +114,10 @@ public class FestivoServicio implements IFestivosServicio  {
     }
 
     public List<Date> obtenerFestivos(int año) {
-        List<Holiday> festivos = Data.findAll();
+        List<Festivo> festivos = Data.findAll();
         festivos = calcularFestivos(festivos, año);
         List<Date> fechas = new ArrayList<Date>();
-        for (final Holiday festivo : festivos) {
+        for (final Festivo festivo : festivos) {
             fechas.add(festivo.getFecha());
         }
         return fechas;
@@ -127,10 +127,10 @@ public class FestivoServicio implements IFestivosServicio  {
         return fecha1.getYear()==fecha2.getYear() && fecha1.getMonth()==fecha2.getMonth() && fecha1.getDay()==fecha2.getDay();
     }
 
-    private boolean esFestivo(List<Holiday> festivos, Date fecha) {
+    private boolean esFestivo(List<Festivo> festivos, Date fecha) {
         if (festivos != null) {
             festivos = calcularFestivos(festivos, fecha.getYear()+1900);
-            for (final Holiday festivo : festivos) {
+            for (final Festivo festivo : festivos) {
                 Calendar c = Calendar.getInstance();
                 c.setTime(fecha);
                 if (fechasIguales(festivo.getFecha(), fecha))
@@ -147,7 +147,7 @@ public class FestivoServicio implements IFestivosServicio  {
 
          try {
             Date dateformatter = formatter.parse(date);
-            List<Holiday> festivos = Data.findAll();
+            List<Festivo> festivos = Data.findAll();
             return esFestivo(festivos, dateformatter) ? "es festivo" : "no es festivo";
         } catch (ParseException e) {
             e.printStackTrace();
