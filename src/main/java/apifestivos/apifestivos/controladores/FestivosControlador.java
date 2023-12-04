@@ -10,7 +10,7 @@ import apifestivos.apifestivos.interfaces.IFestivosServicio;
 
 
 @RestController
-@RequestMapping("/festivos")
+@RequestMapping("/festivo")
 public class FestivosControlador {
 
     private IFestivosServicio servicio;

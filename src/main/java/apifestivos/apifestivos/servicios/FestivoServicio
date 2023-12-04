@@ -1,4 +1,4 @@
-package apifestivos.festivos.servicios;
+package apifestivos.apifestivos.servicios;
 
 import java.util.Date;
 import java.time.LocalDate;
@@ -9,20 +9,16 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import apifestivos.festivos.interfaces.IFestivosServicio;
-import apifestivos.festivos.modelos.Festivo;
-import apifestivos.festivos.repositorios.IFestivosRepositorio;
+import apifestivos.apifestivos.interfaces.IFestivosServicio;
+import apifestivos.apifestivos.modelos.Festivo;
+import apifestivos.apifestivos.repositorios.FestivosRepositorio;
 
 @Service
-public class FestivoServicio implements IFestivosServicio  {
+public class FestivoServicio implements IFestivosServicio {
+
     @Autowired
-    private IFestivos Data;
-    
-    @Override
-    public List<Festivo> ListHoliday() {
-        return (List<Festivo>)Data.findAll();
-    }
-    
+    FestivosRepositorio repositorio;
+
     private Date obtenerDomingoPascua(int año) {
         int mes, dia, A, B, C, D, E, M, N;
         M = 0;
@@ -73,7 +69,7 @@ public class FestivoServicio implements IFestivosServicio  {
     private Date agregarDias(Date fecha, int dias) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(fecha);
-        cal.add(Calendar.DATE, dias + 1); // minus number would decrement the days
+        cal.add(Calendar.DATE, dias); // minus number would decrement the days
         return cal.getTime();
     }
 
@@ -81,7 +77,7 @@ public class FestivoServicio implements IFestivosServicio  {
         Calendar c = Calendar.getInstance();
         c.setTime(fecha);
         if (c.get(Calendar.DAY_OF_WEEK) > Calendar.MONDAY)
-            fecha = agregarDias(fecha, (7 - c.get(Calendar.DAY_OF_WEEK)) + 1);
+            fecha = agregarDias(fecha, 8 - c.get(Calendar.DAY_OF_WEEK));
         else if (c.get(Calendar.DAY_OF_WEEK) < Calendar.MONDAY)
             fecha = agregarDias(fecha, 1);
         return fecha;
@@ -92,7 +88,7 @@ public class FestivoServicio implements IFestivosServicio  {
             Date pascua = obtenerDomingoPascua(año);
             int i = 0;
             for (final Festivo festivo : festivos) {
-                switch (festivo.getIdtipo()) {
+                switch (festivo.getTipo().getId()) {
                     case 1:
                         festivo.setFecha(new Date(año - 1900, festivo.getMes() - 1, festivo.getDia()));
                         break;
@@ -100,10 +96,10 @@ public class FestivoServicio implements IFestivosServicio  {
                         festivo.setFecha(siguienteLunes(new Date(año - 1900, festivo.getMes() - 1, festivo.getDia())));
                         break;
                     case 3:
-                        festivo.setFecha(agregarDias(pascua, festivo.getDiaspascua()));
+                        festivo.setFecha(agregarDias(pascua, festivo.getDiasPascua()));
                         break;
                     case 4:
-                        festivo.setFecha(siguienteLunes(agregarDias(pascua, festivo.getDiaspascua())));
+                        festivo.setFecha(siguienteLunes(agregarDias(pascua, festivo.getDiasPascua())));
                         break;
                 }
                 festivos.set(i, festivo);
@@ -114,7 +110,7 @@ public class FestivoServicio implements IFestivosServicio  {
     }
 
     public List<Date> obtenerFestivos(int año) {
-        List<Festivo> festivos = Data.findAll();
+        List<Festivo> festivos = repositorio.findAll();
         festivos = calcularFestivos(festivos, año);
         List<Date> fechas = new ArrayList<Date>();
         for (final Festivo festivo : festivos) {
@@ -129,29 +125,26 @@ public class FestivoServicio implements IFestivosServicio  {
 
     private boolean esFestivo(List<Festivo> festivos, Date fecha) {
         if (festivos != null) {
+            // if (festivos.get(0).getFecha() != null && fecha.getYear() !=
+            // festivos.get(0).getFecha().getYear())
             festivos = calcularFestivos(festivos, fecha.getYear()+1900);
+
+            //System.out.println(fecha.getYear());
+
             for (final Festivo festivo : festivos) {
                 Calendar c = Calendar.getInstance();
                 c.setTime(fecha);
-                if (fechasIguales(festivo.getFecha(), fecha))
+                if (fechasIguales(festivo.getFecha(), fecha) || c.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY)
                     return true;
             }
         }
         return false;
     }
-    
-    @Override
-    public String hasHoliday(String date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-        formatter.setLenient(false);
 
-         try {
-            Date dateformatter = formatter.parse(date);
-            List<Festivo> festivos = Data.findAll();
-            return esFestivo(festivos, dateformatter) ? "es festivo" : "no es festivo";
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return "Formato no valido";
-        }
+    @Override
+    public boolean esFestivo(Date fecha) {
+        List<Festivo> festivos = repositorio.findAll();
+        return esFestivo(festivos, fecha);
     }
+
 }

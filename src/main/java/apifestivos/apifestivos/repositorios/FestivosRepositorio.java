@@ -9,3 +9,4 @@ import apifestivos.apifestivos.entidades.Festivo;
 public interface FestivosRepositorio extends JpaRepository<Festivo, Long>  {
     
 }
+
