@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import apifestivos.apifestivos.entidades.Festivo;
 
 @Repository
-public interface FestivosRepositorio extends JpaRepository<Festivo, Long>  {
+public interface FestivosRepositorio extends JpaRepository<Festivo, Integer>  {
     
 }
 

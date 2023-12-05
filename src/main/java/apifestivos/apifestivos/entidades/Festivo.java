@@ -1,5 +1,7 @@
 package apifestivos.apifestivos.entidades;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,6 +31,9 @@ public class Festivo {
 
     @Column(name = "diaspascua", nullable = true)
     private long diaspascua;
+
+    @JsonFormat(pattern = "yyyy/MM/dd")
+    
 
     @ManyToOne
     @JoinColumn(name = "idtipo", referencedColumnName = "id")

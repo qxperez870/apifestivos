@@ -1,5 +1,6 @@
 package apifestivos.apifestivos.controladores;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,9 +11,10 @@ import apifestivos.apifestivos.interfaces.IFestivosServicio;
 
 
 @RestController
-@RequestMapping("/festivo")
+@RequestMapping("/api")
 public class FestivosControlador {
 
+    @Autowired
     private IFestivosServicio servicio;
 
     public FestivosControlador(IFestivosServicio servicio) {
